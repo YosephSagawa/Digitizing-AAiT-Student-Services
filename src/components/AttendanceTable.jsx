@@ -19,7 +19,6 @@ const AttendanceTable = ({ data }) => {
   const [isAttendanceVisible, setIsAttendanceVisible] = useState(false);
   const [present, setPresent] = useState(false);
   const [absent, setAbsent] = useState(false);
-  const [fromHome, setFromHome] = useState(false);
   const [late, setLate] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -40,11 +39,6 @@ const AttendanceTable = ({ data }) => {
    * Toggle the 'Absent' filter.
    */
   const toggleAbsent = () => setAbsent(!absent);
-
-  /**
-   * Toggle the 'Work from Home' filter.
-   */
-  const toggleFromHome = () => setFromHome(!fromHome);
 
   /**
    * Toggle the 'Late' filter.
@@ -87,11 +81,10 @@ const AttendanceTable = ({ data }) => {
   const filteredData = data.filter((row) => {
     const rowDate = new Date(row.date);
     const matchesFilters =
-      (present && row.status === "Work from Office") ||
+      (present && row.status === "Present") ||
       (absent && row.status === "Absent") ||
-      (fromHome && row.status === "Work from Home") ||
-      (late && row.status === "Late Arrival") ||
-      (!present && !absent && !fromHome && !late);
+      (late && row.status === "Late") ||
+      (!present && !absent && !late);
 
     const matchesDateRange =
       (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate);
@@ -125,10 +118,6 @@ const AttendanceTable = ({ data }) => {
           <p>
             <Checkbox value={present} setValue={togglePresent} />
             Present
-          </p>
-          <p>
-            <Checkbox value={fromHome} setValue={toggleFromHome} />
-            From Home
           </p>
           <p>
             <Checkbox value={absent} setValue={toggleAbsent} />
@@ -199,12 +188,6 @@ const AttendanceTable = ({ data }) => {
                   <p className="font-bold text-md">Check-in</p>
                 </th>
                 <th className="py-3 px-4 border-b-2">
-                  <p className="font-bold text-md">Check-out</p>
-                </th>
-                <th className="py-3 px-4 border-b-2">
-                  <p className="font-bold text-md">Work-hours</p>
-                </th>
-                <th className="py-3 px-4 border-b-2">
                   <p className="font-bold text-md">Status</p>
                 </th>
               </tr>
@@ -216,11 +199,9 @@ const AttendanceTable = ({ data }) => {
                   <td className="py-3 px-4 border-b font-normal">{row.day}</td>
                   <td
                     className={`py-3 px-4 border-b font-normal ${
-                      row.status === "Work from Office"
+                      row.status === "Present"
                         ? "text-blue-800"
-                        : row.status === "Work from Home"
-                        ? "text-gray-500"
-                        : row.status === "Late Arrival"
+                        : row.status === "Late"
                         ? "text-yellow-400"
                         : row.status === "Absent"
                         ? "text-red-800"
@@ -229,30 +210,14 @@ const AttendanceTable = ({ data }) => {
                   >
                     {row.checkin}
                   </td>
-                  <td
-                    className={`py-3 px-4 border-b font-normal ${
-                      row.status === "Work from Office"
-                        ? "text-blue-800"
-                        : row.status === "Work from Home"
-                        ? "text-gray-500"
-                        : row.status === "Late Arrival"
-                        ? "text-blue-800"
-                        : "text-red-800"
-                    }`}
-                  >
-                    {row.checkout}
-                  </td>
-                  <td className="py-3 px-4 border-b font-normal">
-                    {row.workHours}
-                  </td>
                   <td className="py-3 px-4 border-b font-normal">
                     <span
                       className={`block px-1 py-2 shadow-md text-xs font-semibold text-center ${
                         row.status === "Absent"
                           ? "bg-high text-red-800"
-                          : row.status === "Work from Office"
+                          : row.status === "Present"
                           ? "bg-low text-blue-800"
-                          : row.status === "Late Arrival"
+                          : row.status === "Late"
                           ? "bg-middle text-yellow-800"
                           : "bg-wfhome text-gray-800"
                       }`}
