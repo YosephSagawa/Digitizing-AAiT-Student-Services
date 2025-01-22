@@ -7,6 +7,7 @@ const StudentAttendanceData = {
       checkin: "8:00 AM",
       totalHours: "4 hours",
       status: "Present",
+      className: "Mathematics",
     },
     {
       id: 2,
@@ -14,6 +15,7 @@ const StudentAttendanceData = {
       day: "Tuesday",
       checkin: "8:30 AM",
       status: "Late",
+      className: "Physics",
     },
     {
       id: 3,
@@ -21,6 +23,7 @@ const StudentAttendanceData = {
       day: "Wednesday",
       checkin: "00:00",
       status: "Absent",
+      className: "Chemistry",
     },
     {
       id: 4,
@@ -28,6 +31,7 @@ const StudentAttendanceData = {
       day: "Thursday",
       checkin: "8:15 AM",
       status: "Present",
+      className: "Biology",
     },
     {
       id: 5,
@@ -35,6 +39,7 @@ const StudentAttendanceData = {
       day: "Friday",
       checkin: "8:45 AM",
       status: "Late",
+      className: "English",
     },
     {
       id: 6,
@@ -42,6 +47,7 @@ const StudentAttendanceData = {
       day: "Saturday",
       checkin: "00:00",
       status: "Absent",
+      className: "History",
     },
     {
       id: 7,
@@ -49,6 +55,7 @@ const StudentAttendanceData = {
       day: "Sunday",
       checkin: "00:00",
       status: "Absent",
+      className: "Geography",
     },
     {
       id: 8,
@@ -56,6 +63,7 @@ const StudentAttendanceData = {
       day: "Monday",
       checkin: "8:00 AM",
       status: "Present",
+      className: "Computer Science",
     },
     {
       id: 9,
@@ -63,6 +71,7 @@ const StudentAttendanceData = {
       day: "Tuesday",
       checkin: "9:00 AM",
       status: "Late",
+      className: "Economics",
     },
     {
       id: 10,
@@ -70,6 +79,7 @@ const StudentAttendanceData = {
       day: "Wednesday",
       checkin: "8:00 AM",
       status: "Present",
+      className: "Physical Education",
     },
   ],
 };

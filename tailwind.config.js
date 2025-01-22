@@ -9,9 +9,9 @@ export default {
       colors: {
         button: "#96B85C",
         background: "#D9D9D9",
-        low: "#98B7EE",
-        middle: "#F5F6A39C",
-        high: "#FF53497A",
+        radishred: "#ee2e4e",
+        midblue: "#1f69b3",
+        picosun: "#f8ef22",
         wfhome: "#EFEFEF",
       },
     },

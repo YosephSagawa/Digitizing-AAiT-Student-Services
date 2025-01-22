@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import AttendancePage from "./pages/AttendancePage";
 import Dashboard from "./pages/Dashboard";
 import StudentAttendance from "./pages/StudentAttendance";
+import StudentDashboard from "./pages/StudentDashboard";
 function App() {
   return (
     <>
@@ -14,6 +15,7 @@ function App() {
           <Route path="/scanning" element={<Scanning_Page />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/student" element={<StudentDashboard />} />
           <Route path="attendance" element={<AttendancePage />} />
           <Route
             path="attendance/report"
