@@ -2,6 +2,8 @@ import { NavLink } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 
+import DashboardCard from "../components/DashboardCard";
+
 const StudentDashboard = () => {
   const [studentId, setStudentId] = useState("");
   const [reason, setReason] = useState("");
@@ -23,33 +25,21 @@ const StudentDashboard = () => {
           </h1>
         </div>
         <div className="flex flex-row flex-wrap sm:grid sm:grid-cols-3 sm:gap-4">
-          <div className="flex flex-col w-full justify-start p-8 mt-2 border-2 rounded-md">
-            <h2 className="font-bold text-lg mb-3">Attendance Report</h2>
-            <p>View your attendance report</p>
-            <NavLink to="/attendance/report">
-              <button className="bg-midblue hover:bg-black text-white font-bold py-2 px-4 rounded mt-2">
-                View Report
-              </button>
-            </NavLink>
-          </div>
-          <div className="flex flex-col w-full justify-start p-8 mt-2 border-2 rounded-md">
-            <h2 className="font-bold text-lg mb-3">Cafeteria Report</h2>
-            <p>View your cafeteria report</p>
-            <NavLink to="/cafeteria/report">
-              <button className="bg-midblue hover:bg-black text-white font-bold py-2 px-4 rounded mt-2">
-                View Report
-              </button>
-            </NavLink>
-          </div>
-          <div className="flex flex-col w-full justify-start p-8 mt-2 border-2 rounded-md">
-            <h2 className="font-bold text-lg mb-3">Dormitory Report</h2>
-            <p>View your dormitory report</p>
-            <NavLink to="/dormitory/report">
-              <button className="bg-midblue hover:bg-black text-white font-bold py-2 px-4 rounded mt-2">
-                View Report
-              </button>
-            </NavLink>
-          </div>
+          <DashboardCard
+            title="Attendance Report"
+            description="View your attendance report"
+            link="/attendance/report"
+          />
+          <DashboardCard
+            title="Cafeteria Logs"
+            description="View your cafeteria Logs"
+            link="/attendance/report"
+          />
+          <DashboardCard
+            title="Dormitory Logs"
+            description="View your dormitory Logs"
+            link="/attendance/report"
+          />
         </div>
 
         <div>
