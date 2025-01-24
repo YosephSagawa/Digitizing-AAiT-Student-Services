@@ -1,9 +1,9 @@
 import React from "react";
-
+import { Outlet } from "react-router-dom";
 //Components
 import DashboardCard from "../components/DashboardCard";
 import Navbar from "../components/Navbar";
-const AdminDashboard = () => {
+const AdminDashboardLayout = () => {
   return (
     <div>
       <Navbar />
@@ -17,22 +17,25 @@ const AdminDashboard = () => {
           <DashboardCard
             title="Manage users"
             description="Manage students and staff"
-            link="/manage_users"
+            link="/dashboard/admin/manage_users"
           />
           <DashboardCard
             title="Manage RFID issueance"
             description="Issue and deactivare RFID cards"
-            link="/RFID_issueance"
+            link="/dashboard/admin/RFID_issueance"
           />
           <DashboardCard
             title="Configure access policies"
             description="Configure entry time and access limits"
-            link="/access_policy"
+            link="/dashboard/admin/access_policy"
           />
         </div>
       </div>
+      <main>
+        <Outlet />
+      </main>
     </div>
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboardLayout;
