@@ -18,16 +18,19 @@ const AdminDashboardLayout = () => {
             title="Manage users"
             description="Manage students and staff"
             link="/dashboard/admin/manage_users"
+            action="Manage"
           />
           <DashboardCard
-            title="Manage RFID issueance"
+            title="Manage RFID issuance"
             description="Issue and deactivare RFID cards"
-            link="/dashboard/admin/RFID_issueance"
+            link="/dashboard/admin/RFID_issuance"
+            action="Provide Service"
           />
           <DashboardCard
             title="Configure access policies"
             description="Configure entry time and access limits"
             link="/dashboard/admin/access_policy"
+            action="Configure"
           />
         </div>
       </div>

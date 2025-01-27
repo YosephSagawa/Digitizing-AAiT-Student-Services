@@ -30,16 +30,19 @@ const StudentDashboard = () => {
             title="Attendance Report"
             description="View your attendance report"
             link="/attendance/report"
+            action="View Report"
           />
           <DashboardCard
             title="Cafeteria Logs"
             description="View your cafeteria Logs"
             link="/dashboard/student/cafeteria_logs"
+            action="View Logs"
           />
           <DashboardCard
             title="Dormitory Logs"
             description="View your dormitory Logs"
             link="/dashboard/student/dormitory_logs"
+            action="View Logs"
           />
         </div>
 

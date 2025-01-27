@@ -81,10 +81,10 @@ const ManageUsers = () => {
                 <td className="border p-2">{user.role}</td>
                 <td className="border p-2">{user.email}</td>
                 <td className="border p-2 text-center">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded mr-2">
+                  <button className="bg-midblue text-white px-3 py-1 rounded mr-2">
                     Edit
                   </button>
-                  <button className="bg-red-500 text-white px-3 py-1 rounded">
+                  <button className="bg-radishred text-white px-3 py-1 rounded">
                     Delete
                   </button>
                 </td>
