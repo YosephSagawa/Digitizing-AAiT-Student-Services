@@ -17,9 +17,11 @@ const RFIDIssuancePage = () => {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">RFID Card Issuance</h2>
-      <div className="flex flex-col gap-4 max-w-lg">
+    <div className="p-6 mx-auto max-w-xl">
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        RFID Card Issuance
+      </h2>
+      <div className="flex flex-col gap-4 min-w-6xl">
         <input
           type="text"
           placeholder="Enter RFID Card Number"
@@ -35,7 +37,7 @@ const RFIDIssuancePage = () => {
           onChange={(e) => setUserId(e.target.value)}
         />
         <button
-          className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
+          className="bg-midblue hover:bg-black text-white font-bold py-2 px-4 rounded mt-2"
           onClick={handleIssueCard}
         >
           Issue RFID Card

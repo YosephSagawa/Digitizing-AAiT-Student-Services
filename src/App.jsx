@@ -10,7 +10,7 @@ import ProctorDashboard from "./pages/ProctorDashboard";
 import DormitoryLogs from "./components/DormitoryLogs";
 import CafeteriaLogs from "./components/CafeteriaLogs";
 import ManageUsers from "./pages/ManageUsers";
-import RFIDIssuancePage from "./pages/RFIDIssuancePage";
+import RFIDIssuancePage from "./pages/RFIDIssuance";
 
 function App() {
   return (
