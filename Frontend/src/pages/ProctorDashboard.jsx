@@ -15,19 +15,22 @@ const ProctorDashboard = () => {
         </div>
         <div className="flex flex-row flex-wrap sm:grid sm:grid-cols-3 sm:gap-4">
           <DashboardCard
-            title="Manage users"
-            description="Manage students and staff"
-            link="/manage_users"
+            title="Student Allocation"
+            description="Manage students dormitory allocation"
+            link="/dormitory/student_allocation"
+            action="Allocation"
           />
           <DashboardCard
-            title="Manage RFID issueance"
-            description="Issue and deactivare RFID cards"
-            link="/RFID_issueance"
+            title="Manage Dorms"
+            description="Manage dormitory Resources"
+            link="/dormitory/dorm_management"
+            action="Dorm Management"
           />
           <DashboardCard
             title="Configure access policies"
             description="Configure entry time and access limits"
-            link="/access_policy"
+            link="/dormitory/access_policy"
+            action="Access Policy"
           />
         </div>
       </div>
