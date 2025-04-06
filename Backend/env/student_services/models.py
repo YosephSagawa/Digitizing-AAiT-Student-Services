@@ -33,7 +33,7 @@ class Student(models.Model):
     email = models.EmailField(max_length=100, unique=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     rfid_tag = models.OneToOneField(RFIDTag, on_delete=models.CASCADE)
-
+    image = models.ImageField(upload_to ="student_images/", blank=True, null=True)
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.student_id})"
 
@@ -42,7 +42,8 @@ class Instructor(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=100, unique=True)
-
+    rfid_tag = models.OneToOneField(RFIDTag, on_delete=models.CASCADE, blank=True, null=True)
+    image = models.ImageField(upload_to="instructor_images/", blank = True, null = True)
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.instructor_id})"
 
