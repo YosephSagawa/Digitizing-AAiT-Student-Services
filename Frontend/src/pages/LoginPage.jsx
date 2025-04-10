@@ -1,9 +1,12 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import AAU_Logo from "../assets/AAU_Logo.png";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
+
   const validationSchema = Yup.object({
     userName: Yup.string()
       .required("Username is required.")
@@ -13,16 +16,45 @@ const LoginForm = () => {
       .min(8, "Password must be at least 8 characters long."),
   });
 
+  const handleLogin = async (values, { setSubmitting, setErrors }) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/login/",
+        {
+          username: values.userName,
+          password: values.password,
+        }
+      );
+
+      const { access, refresh, role } = response.data;
+
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      localStorage.setItem("user_role", role);
+
+      // Redirect based on role
+      if (role === "student") navigate("/dashboard/student");
+      else if (role === "instructor") navigate("/dashboard/lecturer");
+      else if (role === "proctor") navigate("/dashboard/proctor");
+      else navigate("/"); // fallback
+    } catch (error) {
+      setErrors({
+        password: "Invalid username or password.",
+      });
+    } finally {
+      setSubmitting(false);
+      console.log("Login submitted:", response.data);
+    }
+  };
+
   return (
     <Formik
       initialValues={{ userName: "", password: "" }}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log(values);
-      }}
+      onSubmit={handleLogin}
     >
-      {() => (
-        <Form className="flex flex-col ">
+      {({ isSubmitting }) => (
+        <Form className="flex flex-col">
           <Field
             type="text"
             name="userName"
@@ -32,7 +64,7 @@ const LoginForm = () => {
           <ErrorMessage
             name="userName"
             component="div"
-            className="text-[14px] text-[red] mt-1 "
+            className="text-[14px] text-[red] mt-1"
           />
           <Field
             type="password"
@@ -43,13 +75,14 @@ const LoginForm = () => {
           <ErrorMessage
             name="password"
             component="div"
-            className="text-[14px] text-[red] mt-1 "
+            className="text-[14px] text-[red] mt-1"
           />
           <button
             type="submit"
+            disabled={isSubmitting}
             className="bg-[#96B85C] text-white py-2 mt-5 w-[70vw] sm:w-[22vw]"
           >
-            Continue
+            {isSubmitting ? "Logging in..." : "Continue"}
           </button>
         </Form>
       )}
@@ -60,9 +93,7 @@ const LoginForm = () => {
 const LoginPage = () => {
   return (
     <div className="flex flex-col">
-      <div
-        className={`flex flex-col items-center justify-center box-border bg-login-bg bg-gray-200 text-center mx-auto w-[100vw] h-[100vh] sm:w-auto sm:h-auto sm:bg-none sm:bg-transparent `}
-      >
+      <div className="flex flex-col items-center justify-center box-border bg-login-bg bg-gray-200 text-center mx-auto w-[100vw] h-[100vh] sm:w-auto sm:h-auto sm:bg-none sm:bg-transparent">
         <header>
           <img
             src={AAU_Logo}
@@ -72,7 +103,7 @@ const LoginPage = () => {
         </header>
         <img src={AAU_Logo} alt="AAU Logo" className="p-8 block sm:hidden" />
         <h1 className="text-[20px] pt-5">Login</h1>
-        <LoginForm className="flex flex-col" />
+        <LoginForm />
       </div>
     </div>
   );
