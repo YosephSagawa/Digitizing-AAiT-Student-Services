@@ -1,7 +1,15 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import RFIDTag,Student,Instructor,Classes,ClassEnrollment,Attendance,AccessControl,Dormitory,DormitoryAssignment,CafeteriaTransaction
+from .models import RFIDTag,Student,Instructor,Classes,ClassEnrollment,Attendance,AccessControl,Dormitory,DormitoryAssignment,CafeteriaTransaction,User
+
+class UserAdmin(BaseUserAdmin):
+    fieldsets = BaseUserAdmin.fieldsets + (
+        ('Role Info', {'fields': ('role',)}),
+    )
+
 # Register your models here.
+admin.site.register(User, UserAdmin)
 admin.site.register(RFIDTag)
 admin.site.register(Student)
 admin.site.register(Instructor)

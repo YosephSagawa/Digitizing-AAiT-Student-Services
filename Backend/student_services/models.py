@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
@@ -17,6 +18,17 @@ ACCESS_STATUS_CHOICES = [
     ('granted', 'Granted'),
     ('denied', 'Denied'),
 ]
+
+class User(AbstractUser):
+    ROLE_CHOICES = (
+        ('student', 'Student'),
+        ('instructor', 'Instructor'),
+        ('proctor', 'Proctor'),
+    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+
+    def __str__(self):
+        return f"{self.username} ({self.role})"
 
 class RFIDTag(models.Model):
     rfid_tag_id = models.CharField(max_length=50, primary_key=True)
