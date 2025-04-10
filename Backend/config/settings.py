@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     #local apps
-    "student_services"
+    "student_services",
 ]
 
 MIDDLEWARE = [
