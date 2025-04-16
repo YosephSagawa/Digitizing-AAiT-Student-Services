@@ -1,9 +1,40 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import User, RFIDTag, Student, Instructor, Classes, ClassEnrollment, Attendance, AccessControl, Dormitory, DormitoryAssignment, CafeteriaTransaction
-from .serializers import UserSerializer, RFIDTagSerializer, StudentSerializer, InstructorSerializer, ClassesSerializer, ClassEnrollmentSerializer, AttendanceSerializer, AccessControlSerializer, DormitorySerializer, DormitoryAssignmentSerializer, CafeteriaTransactionSerializer, CustomTokenObtainPairSerializer
+from .models import User, RFIDTag, Student, Instructor, Classes, ClassEnrollment, Attendance, AccessControl, Dormitory, DormitoryAssignment, CafeteriaTransaction, StudentProfile, InstructorProfile
+from .serializers import UserSerializer, RFIDTagSerializer, StudentSerializer, InstructorSerializer, ClassesSerializer, ClassEnrollmentSerializer, AttendanceSerializer, AccessControlSerializer, DormitorySerializer, DormitoryAssignmentSerializer, CafeteriaTransactionSerializer, CustomTokenObtainPairSerializer, StudentProfileSerializer,InstructorProfileSerializer
 
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        user = request.user
+
+        # Return basic user data
+        user_data = UserSerializer(user).data
+
+        # Append profile data based on role
+        if user.role == 'student':
+            try:
+                profile = StudentProfile.objects.get(user=user)
+                user_data['profile'] = StudentProfileSerializer(profile).data
+            except StudentProfile.DoesNotExist:
+                return Response({"error": "Student profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        elif user.role == 'instructor':
+            try:
+                profile = InstructorProfile.objects.get(user=user)
+                user_data['profile'] = InstructorProfileSerializer(profile).data
+            except InstructorProfile.DoesNotExist:
+                return Response({"error": "Instructor profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        else:
+            user_data['profile'] = None  # For proctor or future roles
+
+        return Response(user_data)
+    
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 class UserViewSet(viewsets.ModelViewSet):

@@ -130,3 +130,19 @@ class CafeteriaTransaction(models.Model):
 
     def __str__(self):
         return f"{self.rfid_tag} - {self.service_type} at {self.transaction_time}"
+
+
+class StudentProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
+    student = models.OneToOneField(Student, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.student}"
+
+
+class InstructorProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='instructor_profile')
+    instructor = models.OneToOneField(Instructor, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.instructor}"

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import User, RFIDTag, Student, Instructor, Classes, ClassEnrollment, Attendance, AccessControl, Dormitory, DormitoryAssignment, CafeteriaTransaction
+from .models import User, RFIDTag, Student, Instructor, Classes, ClassEnrollment, Attendance, AccessControl, Dormitory, DormitoryAssignment, CafeteriaTransaction, StudentProfile, InstructorProfile
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -88,3 +88,15 @@ class CafeteriaTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CafeteriaTransaction
         fields = ['transaction_id', 'rfid_tag', 'service_type', 'transaction_time', 'date']
+
+class StudentProfileSerializer(serializers.ModelSerializer):
+    student = StudentSerializer()
+    class Meta:
+        model = StudentProfile
+        fields = ['student']
+
+class InstructorProfileSerializer(serializers.ModelSerializer):
+    instructor = InstructorSerializer()
+    class Meta:
+        model = InstructorProfile
+        fields = ['instructor']
