@@ -1,4 +1,5 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 
 //Components
 import DashboardCard from "../components/DashboardCard";
@@ -17,7 +18,7 @@ const ProctorDashboard = () => {
           <DashboardCard
             title="Student Allocation"
             description="Manage students dormitory allocation"
-            link="/dormitory/student_allocation"
+            link="/dashboard/proctor/student_allocation"
             action="Allocation"
           />
           <DashboardCard
@@ -26,13 +27,8 @@ const ProctorDashboard = () => {
             link="/dormitory/dorm_management"
             action="Dorm Management"
           />
-          <DashboardCard
-            title="Configure access policies"
-            description="Configure entry time and access limits"
-            link="/dormitory/access_policy"
-            action="Access Policy"
-          />
         </div>
+        <Outlet />
       </div>
     </div>
   );

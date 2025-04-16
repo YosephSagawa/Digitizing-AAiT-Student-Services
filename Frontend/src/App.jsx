@@ -11,6 +11,7 @@ import DormitoryLogs from "./components/DormitoryLogs";
 import CafeteriaLogs from "./components/CafeteriaLogs";
 import ManageUsers from "./pages/ManageUsers";
 import RFIDIssuancePage from "./pages/RFIDIssuance";
+import StudentAllocation from "./pages/StudentAllocation";
 
 function App() {
   return (
@@ -47,7 +48,13 @@ function App() {
               element={<ManageUsers />}
             />
           </Route>
-          <Route path="/dashboard/proctor" element={<ProctorDashboard />} />
+          <Route path="/dashboard/proctor" element={<ProctorDashboard />}>
+            <Route
+              path="/dashboard/proctor/student_allocation"
+              element={<StudentAllocation />}
+            />
+            <Route></Route>
+          </Route>
         </Routes>
       </Router>
     </>

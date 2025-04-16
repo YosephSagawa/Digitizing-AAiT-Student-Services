@@ -169,6 +169,9 @@ const ClassAttendanceTable = ({ data }) => {
           <thead>
             <tr className="bg-white text-left border-t">
               <th className="py-3 px-4 border-b-2 font-bold text-md">Mark</th>
+              <th className="py-3 px-4 border-b-2 font-bold text-md">
+                ClassName
+              </th>
               <th className="py-3 px-4 border-b-2 font-bold text-md">Date</th>
               <th className="py-3 px-4 border-b-2 font-bold text-md">
                 Student Name
@@ -189,6 +192,7 @@ const ClassAttendanceTable = ({ data }) => {
                     onChange={() => handleCheckboxChange(row.id)}
                   />
                 </td>
+                <td className="py-3 px-4 border-b">{row.className}</td>
                 <td className="py-3 px-4 border-b">{row.date}</td>
                 <td className="py-3 px-4 border-b">{row.studentName}</td>
                 <td className="py-3 px-4 border-b">{row.status}</td>
