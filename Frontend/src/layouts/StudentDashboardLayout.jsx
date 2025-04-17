@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import { getStudentProfile } from "../services/api";
 
 //Components
 import DashboardCard from "../components/DashboardCard";
@@ -9,6 +10,22 @@ const StudentDashboard = () => {
   const [studentId, setStudentId] = useState("");
   const [reason, setReason] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [student, setStudent] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getStudentProfile();
+        setStudent(data.profile.student);
+      } catch (error) {
+        console.error("Failed to fetch student profile", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (!student) return <p>Loading...</p>;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,11 +35,11 @@ const StudentDashboard = () => {
 
   return (
     <div>
-      <Navbar />
+      <Navbar name={student.first_name} photo={student.image} />
       <div className="px-6">
         <div className="flex flex-col w-fit justify-start sm:p-8 mt-2">
           <h1 className="text-2xl sm:text-4xl font-bold mt-8 sm:mt-0">
-            Student Dashboard
+            Welcome, {student.first_name || "Student"}!
           </h1>
         </div>
         <div className="flex flex-row flex-wrap sm:grid sm:grid-cols-3 sm:gap-4">
