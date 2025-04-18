@@ -1,10 +1,38 @@
-import React from "react";
-import StudentData from "../stores/StudentData";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const CafeteriaLogs = () => {
-  const SpecificStudent = StudentData.Students.find(
-    (student) => student.id === 1
-  );
+  const [logs, setLogs] = useState([]);
+  const token = localStorage.getItem("access_token");
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const profileRes = await axios.get(
+          "http://localhost:8000/api/auth/profile/",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const studentRFID =
+          profileRes.data.profile.student.rfid_tag.rfid_tag_id;
+
+        const logsRes = await axios.get(
+          `http://localhost:8000/api/cafeteria-transactions/?rfid_tag__rfid_tag_id=${studentRFID}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        setLogs(logsRes.data);
+      } catch (error) {
+        console.error("Error fetching logs:", error);
+      }
+    };
+
+    fetchLogs();
+  }, []);
 
   return (
     <div className="font-Montserrat p-4 overflow-x-auto">
@@ -19,17 +47,19 @@ const CafeteriaLogs = () => {
           </tr>
         </thead>
         <tbody>
-          {SpecificStudent ? (
-            SpecificStudent.cafeteriaLogs.map((log, index) => (
+          {logs.length ? (
+            logs.map((log, index) => (
               <tr key={index} className="hover:bg-gray-50">
-                <td className="py-3 px-4 border-b">{log.logTime}</td>
-                <td className="py-3 px-4 border-b">{log.meal}</td>
+                <td className="py-3 px-4 border-b">
+                  {new Date(log.transaction_time).toLocaleString()}
+                </td>
+                <td className="py-3 px-4 border-b">{log.service_type}</td>
               </tr>
             ))
           ) : (
-            <tr className="hover:bg-gray-50">
-              <td className="py-3 px-4 border-b" colSpan="3">
-                No data available
+            <tr>
+              <td colSpan="2" className="py-3 px-4 text-center">
+                No logs found
               </td>
             </tr>
           )}
