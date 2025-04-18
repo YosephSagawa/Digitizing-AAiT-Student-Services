@@ -19,6 +19,19 @@ ACCESS_STATUS_CHOICES = [
     ('denied', 'Denied'),
 ]
 
+ACCESS_LOCATION_CHOICES = [
+    ('gate', 'Gate'),
+    ('dormitory', 'Dormitory'),
+]
+
+CAFETERIA_SERVICE_CHOICES = [
+    ('breakfast', 'Breakfast'),
+    ('lunch', 'Lunch'),
+    ('dinner', 'Dinner'),
+]
+
+
+
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('student', 'Student'),
@@ -93,7 +106,7 @@ class Attendance(models.Model):
 class AccessControl(models.Model):
     access_id = models.AutoField(primary_key=True)
     rfid_tag = models.ForeignKey(RFIDTag, on_delete=models.CASCADE)
-    location = models.CharField(max_length=50)
+    location = models.CharField(max_length=50, choices=ACCESS_LOCATION_CHOICES)
     access_time = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=10, choices=ACCESS_STATUS_CHOICES, default='granted')
 
@@ -124,7 +137,7 @@ class DormitoryAssignment(models.Model):
 class CafeteriaTransaction(models.Model):
     transaction_id = models.AutoField(primary_key=True)
     rfid_tag = models.ForeignKey(RFIDTag, on_delete=models.CASCADE)
-    service_type = models.CharField(max_length=50)
+    service_type = models.CharField(max_length=50, choices=CAFETERIA_SERVICE_CHOICES)
     transaction_time = models.DateTimeField(default=timezone.now)
     date = models.DateField(default=timezone.now)
 
