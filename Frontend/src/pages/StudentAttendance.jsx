@@ -1,12 +1,42 @@
 import Navbar from "../components/Navbar";
-
-//Data
-import StudentAttendanceData from "../stores/StudentAttendanceData";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 //Components
 import AttendanceTable from "../components/AttendanceTable";
 
 const StudentAttendance = () => {
+  const [attendanceData, setAttendanceData] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    const fetchAttendance = async () => {
+      try {
+        const profileRes = await axios.get(
+          "http://localhost:8000/api/auth/profile/",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const studentId = profileRes.data.profile.student.student_id;
+
+        const attendanceRes = await axios.get(
+          `http://localhost:8000/api/attendance/?student__student_id=${studentId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        setAttendanceData(attendanceRes.data);
+      } catch (error) {
+        console.error("Error fetching attendance:", error);
+      }
+    };
+
+    fetchAttendance();
+  }, []);
+
   return (
     <div>
       <Navbar />
@@ -20,7 +50,7 @@ const StudentAttendance = () => {
           </p>
         </div>
       </div>
-      <AttendanceTable data={StudentAttendanceData.Attendance} />
+      <AttendanceTable data={attendanceData} />
     </div>
   );
 };

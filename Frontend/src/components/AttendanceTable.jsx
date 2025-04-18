@@ -16,7 +16,12 @@ const AttendanceTable = ({ data }) => {
   const [selectedClass, setSelectedClass] = useState("All");
 
   // Extract unique class names for dropdown
-  const classOptions = ["All", ...new Set(data.map((row) => row.className))];
+  const classOptions = [
+    "All",
+    ...new Set(
+      data.map((row) => row.class_instance?.class_name).filter(Boolean)
+    ),
+  ];
 
   // Toggle attendance visibility
   const toggleAttendance = () => setIsAttendanceVisible(!isAttendanceVisible);
@@ -48,17 +53,20 @@ const AttendanceTable = ({ data }) => {
   // Filter data based on selected criteria
   const filteredData = data.filter((row) => {
     const rowDate = new Date(row.date);
+    const status = row.status?.toLowerCase();
+
     const matchesFilters =
-      (present && row.status === "Present") ||
-      (absent && row.status === "Absent") ||
-      (late && row.status === "Late") ||
+      (present && status === "present") ||
+      (absent && status === "absent") ||
+      (late && status === "late") ||
       (!present && !absent && !late);
 
     const matchesDateRange =
       (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate);
 
     const matchesClass =
-      selectedClass === "All" || row.className === selectedClass;
+      selectedClass === "All" ||
+      row.class_instance?.class_name === selectedClass;
 
     return matchesFilters && matchesDateRange && matchesClass;
   });
@@ -68,9 +76,15 @@ const AttendanceTable = ({ data }) => {
       <div className="flex flex-col sm:flex-row p-8">
         <button onClick={toggleAttendance} className="mb-6 sm:mb-0">
           <img
-            src={ProfileImage}
+            src={
+              data[0]?.student?.image
+                ? data[0].student.image.startsWith("http")
+                  ? data[0].student.image
+                  : `http://localhost:8000${data[0].student.image}`
+                : ProfileImage
+            }
             alt="User Picture"
-            className="w-14 h-14 inline"
+            className="w-14 h-14 inline rounded-full"
           />
           <span className="ml-2 sm:text-2xl text-xl text-[#252C58]">
             Attendance Overview
@@ -101,6 +115,7 @@ const AttendanceTable = ({ data }) => {
           </p>
         </div>
       </div>
+
       <div className="flex sm:flex-row flex-col items-center justify-between">
         <div className="flex flex-col items-center gap-4 px-8 mb-4">
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center ">
@@ -184,27 +199,41 @@ const AttendanceTable = ({ data }) => {
               </tr>
             </thead>
             <tbody>
-              {filteredData.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 border-b">{row.date}</td>
-                  <td className="py-3 px-4 border-b">{row.day}</td>
-                  <td className="py-3 px-4 border-b">{row.className}</td>
-                  <td className="py-3 px-4 border-b">{row.checkin}</td>
-                  <td className="py-3 px-4 border-b">
-                    <span
-                      className={`block px-1 py-2 shadow-md text-xs font-semibold text-center ${
-                        row.status === "Absent"
-                          ? "bg-radishred text-white"
-                          : row.status === "Present"
-                          ? "bg-midblue text-white"
-                          : "bg-picosun text-black"
-                      }`}
-                    >
-                      {row.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {filteredData.map((row) => {
+                const timeIn = new Date(row.time_in).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+                const status = row.status?.toLowerCase();
+
+                return (
+                  <tr key={row.attendance_id} className="hover:bg-gray-50">
+                    <td className="py-3 px-4 border-b">{row.date}</td>
+                    <td className="py-3 px-4 border-b">
+                      {new Date(row.date).toLocaleDateString("en-US", {
+                        weekday: "long",
+                      })}
+                    </td>
+                    <td className="py-3 px-4 border-b">
+                      {row.class_instance?.class_name || "N/A"}
+                    </td>
+                    <td className="py-3 px-4 border-b">{timeIn}</td>
+                    <td className="py-3 px-4 border-b">
+                      <span
+                        className={`block px-1 py-2 shadow-md text-xs font-semibold text-center capitalize ${
+                          status === "absent"
+                            ? "bg-radishred text-white"
+                            : status === "present"
+                            ? "bg-midblue text-white"
+                            : "bg-picosun text-black"
+                        }`}
+                      >
+                        {status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
