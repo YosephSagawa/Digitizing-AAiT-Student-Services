@@ -7,7 +7,7 @@ import StudentDashboardLayout from "./layouts/StudentDashboardLayout";
 import LecturerDashboard from "./pages/LecturerDashboard";
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout";
 import ProctorDashboard from "./pages/ProctorDashboard";
-import DormitoryLogs from "./components/DormitoryLogs";
+import DormitoryLogs from "./components/AccessLogs";
 import CafeteriaLogs from "./components/CafeteriaLogs";
 import ManageUsers from "./pages/ManageUsers";
 import RFIDIssuancePage from "./pages/RFIDIssuance";
@@ -27,7 +27,7 @@ function App() {
               element={<CafeteriaLogs />}
             />
             <Route
-              path="/dashboard/student/dormitory_logs"
+              path="/dashboard/student/access_logs"
               element={<DormitoryLogs />}
             />
           </Route>

@@ -56,9 +56,9 @@ const StudentDashboard = () => {
             action="View Logs"
           />
           <DashboardCard
-            title="Dormitory Logs"
-            description="View your dormitory Logs"
-            link="/dashboard/student/dormitory_logs"
+            title="Access Logs"
+            description="View your access Logs"
+            link="/dashboard/student/access_logs"
             action="View Logs"
           />
         </div>

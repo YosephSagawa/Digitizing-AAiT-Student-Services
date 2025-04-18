@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import User, RFIDTag, Student, Instructor, Classes, ClassEnrollment, Attendance, AccessControl, Dormitory, DormitoryAssignment, CafeteriaTransaction, StudentProfile, InstructorProfile
 from .serializers import UserSerializer, RFIDTagSerializer, StudentSerializer, InstructorSerializer, ClassesSerializer, ClassEnrollmentSerializer, AttendanceSerializer, AccessControlSerializer, DormitorySerializer, DormitoryAssignmentSerializer, CafeteriaTransactionSerializer, CustomTokenObtainPairSerializer, StudentProfileSerializer,InstructorProfileSerializer
@@ -69,6 +70,8 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 class AccessControlViewSet(viewsets.ModelViewSet):
     queryset = AccessControl.objects.all()
     serializer_class = AccessControlSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['rfid_tag__rfid_tag_id', 'location']
 
 class DormitoryViewSet(viewsets.ModelViewSet):
     queryset = Dormitory.objects.all()
