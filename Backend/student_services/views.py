@@ -49,6 +49,8 @@ class RFIDTagViewSet(viewsets.ModelViewSet):
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['rfid_tag__rfid_tag_id']
 
 class InstructorViewSet(viewsets.ModelViewSet):
     queryset = Instructor.objects.all()

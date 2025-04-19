@@ -75,12 +75,18 @@ class DormitorySerializer(serializers.ModelSerializer):
         fields = ['dormitory_id', 'dormitory_name', 'room_number', 'capacity']
 
 class DormitoryAssignmentSerializer(serializers.ModelSerializer):
-    student = StudentSerializer()  # Nested StudentSerializer
-    dormitory = DormitorySerializer()  # Nested DormitorySerializer
+   # Directly reference the existing student and dormitory by their IDs
+    student = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
+    dormitory = serializers.PrimaryKeyRelatedField(queryset=Dormitory.objects.all())
 
     class Meta:
         model = DormitoryAssignment
         fields = ['assignment_id', 'student', 'dormitory', 'assignment_date']
+
+    def create(self, validated_data):
+        # You can directly use the validated data to create the DormitoryAssignment
+        dormitory_assignment = DormitoryAssignment.objects.create(**validated_data)
+        return dormitory_assignment
 
 class CafeteriaTransactionSerializer(serializers.ModelSerializer):
     rfid_tag = RFIDTagSerializer()  # Nested RFIDTagSerializer

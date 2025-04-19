@@ -12,6 +12,7 @@ import CafeteriaLogs from "./components/CafeteriaLogs";
 import ManageUsers from "./pages/ManageUsers";
 import RFIDIssuancePage from "./pages/RFIDIssuance";
 import StudentAllocation from "./pages/StudentAllocation";
+import ManageDorms from "./pages/ManageDorms";
 
 function App() {
   return (
@@ -53,7 +54,12 @@ function App() {
               path="/dashboard/proctor/student_allocation"
               element={<StudentAllocation />}
             />
-            <Route></Route>
+            <Route>
+              <Route
+                path="/dashboard/proctor/dorm_management"
+                element={<ManageDorms />}
+              />
+            </Route>
           </Route>
         </Routes>
       </Router>

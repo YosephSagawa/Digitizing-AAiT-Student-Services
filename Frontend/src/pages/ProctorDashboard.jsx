@@ -14,7 +14,7 @@ const ProctorDashboard = () => {
             Proctor Dashboard
           </h1>
         </div>
-        <div className="flex flex-row flex-wrap sm:grid sm:grid-cols-3 sm:gap-4">
+        <div className="flex flex-row flex-wrap sm:grid sm:grid-cols-2 sm:gap-4">
           <DashboardCard
             title="Student Allocation"
             description="Manage students dormitory allocation"
@@ -24,7 +24,7 @@ const ProctorDashboard = () => {
           <DashboardCard
             title="Manage Dorms"
             description="Manage dormitory Resources"
-            link="/dormitory/dorm_management"
+            link="/dashboard/proctor/dorm_management"
             action="Dorm Management"
           />
         </div>
