@@ -1,8 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import Scanning_Page from "./pages/Scanning_Page";
 import LoginPage from "./pages/LoginPage";
-import StudentAttendance from "./pages/StudentAttendance";
+import Scanning_Page from "./pages/Scanning_Page";
 import StudentDashboardLayout from "./layouts/StudentDashboardLayout";
 import LecturerDashboard from "./pages/LecturerDashboard";
 import AdminDashboardLayout from "./layouts/AdminDashboardLayout";
@@ -13,57 +11,54 @@ import ManageUsers from "./pages/ManageUsers";
 import RFIDIssuancePage from "./pages/RFIDIssuance";
 import StudentAllocation from "./pages/StudentAllocation";
 import ManageDorms from "./pages/ManageDorms";
+import StudentAttendance from "./pages/StudentAttendance";
+
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/scanning" element={<Scanning_Page />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="/dashboard/student" element={<StudentDashboardLayout />}>
-            <Route
-              path="/dashboard/student/cafeteria_logs"
-              element={<CafeteriaLogs />}
-            />
-            <Route
-              path="/dashboard/student/access_logs"
-              element={<DormitoryLogs />}
-            />
-          </Route>
-          <Route path="dashboard/lecturer" element={<LecturerDashboard />} />
-          <Route path="attendance/report" element={<StudentAttendance />} />
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/scanning" element={<Scanning_Page />} />
 
+        {/* Student Routes */}
+        <Route element={<PrivateRoute allowedRoles={["student"]} />}>
+          <Route path="/dashboard/student" element={<StudentDashboardLayout />}>
+            <Route path="cafeteria_logs" element={<CafeteriaLogs />} />
+            <Route path="access_logs" element={<DormitoryLogs />} />
+          </Route>
+        </Route>
+
+        {/* Lecturer Routes */}
+        <Route element={<PrivateRoute allowedRoles={["instructor"]} />}>
+          <Route path="/dashboard/lecturer" element={<LecturerDashboard />} />
+        </Route>
+
+        {/* Student Attendance (can also restrict if needed) */}
+        <Route element={<PrivateRoute allowedRoles={["student"]} />}>
+          <Route path="/attendance/report" element={<StudentAttendance />} />
+        </Route>
+
+        {/* Admin Routes */}
+        <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
           <Route path="/dashboard/admin" element={<AdminDashboardLayout />}>
-            <Route
-              path="/dashboard/admin/manage_users"
-              element={<ManageUsers />}
-            />
-            <Route
-              path="/dashboard/admin/RFID_issuance"
-              element={<RFIDIssuancePage />}
-            />
-            <Route
-              path="/dashboard/admin/access_policy"
-              element={<ManageUsers />}
-            />
+            <Route path="manage_users" element={<ManageUsers />} />
+            <Route path="RFID_issuance" element={<RFIDIssuancePage />} />
+            <Route path="access_policy" element={<ManageUsers />} />
           </Route>
+        </Route>
+
+        {/* Proctor Routes */}
+        <Route element={<PrivateRoute allowedRoles={["proctor"]} />}>
           <Route path="/dashboard/proctor" element={<ProctorDashboard />}>
-            <Route
-              path="/dashboard/proctor/student_allocation"
-              element={<StudentAllocation />}
-            />
-            <Route>
-              <Route
-                path="/dashboard/proctor/dorm_management"
-                element={<ManageDorms />}
-              />
-            </Route>
+            <Route path="student_allocation" element={<StudentAllocation />} />
+            <Route path="dorm_management" element={<ManageDorms />} />
           </Route>
-        </Routes>
-      </Router>
-    </>
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 
