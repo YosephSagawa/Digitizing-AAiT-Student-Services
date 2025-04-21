@@ -2,10 +2,13 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import AAU_Logo from "../assets/AAU_Logo.png";
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const validationSchema = Yup.object({
     userName: Yup.string()
@@ -53,7 +56,7 @@ const LoginForm = () => {
       validationSchema={validationSchema}
       onSubmit={handleLogin}
     >
-      {({ isSubmitting }) => (
+      {({ isSubmitting, handleChange, values }) => (
         <Form className="flex flex-col">
           <Field
             type="text"
@@ -66,12 +69,34 @@ const LoginForm = () => {
             component="div"
             className="text-[14px] text-[red] mt-1"
           />
-          <Field
+          {/* <Field
             type="password"
             name="password"
             placeholder="Password"
             className="border border-gray-400 p-2 mt-5 w-[70vw] sm:w-[22vw] text-[10px]"
-          />
+          /> */}
+          {/* Custom password field with toggle */}
+          <div className="relative mt-5 w-[70vw] sm:w-[22vw]">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={values.password}
+              onChange={handleChange}
+              className="border border-gray-400 p-2 w-full text-[10px]"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+            >
+              {showPassword ? (
+                <AiFillEyeInvisible size={18} />
+              ) : (
+                <AiFillEye size={18} />
+              )}
+            </button>
+          </div>
           <ErrorMessage
             name="password"
             component="div"

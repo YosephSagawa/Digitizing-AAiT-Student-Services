@@ -121,67 +121,68 @@ const LecturerDashboard = () => {
         </div>
 
         {/* Filter Section */}
-        <div className="flex sm:flex-row flex-col gap-2 sm:mb-4">
-          <div className="flex flex-col sm:flex-row gap-3 items-center">
-            <ReactDatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              selectsStart
-              startDate={startDate}
-              endDate={endDate}
-              placeholderText="Start Date"
-              className="border p-2 rounded"
-            />
-            <ReactDatePicker
-              selected={endDate}
-              onChange={(date) => setEndDate(date)}
-              selectsEnd
-              startDate={startDate}
-              endDate={endDate}
-              placeholderText="End Date"
-              className="border p-2 rounded"
-            />
+        <div className="flex sm:flex-row flex-col items-center justify-between">
+          <div className="flex flex-col items-center gap-4 px-8 mb-4">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center ">
+              <ReactDatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                selectsStart
+                startDate={startDate}
+                endDate={endDate}
+                placeholderText="Start Date (MM/DD/YYYY)"
+                className="border p-2 rounded"
+              />
+              <ReactDatePicker
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                selectsEnd
+                startDate={startDate}
+                endDate={endDate}
+                placeholderText="End Date (optional)"
+                className="border p-2 rounded"
+              />
+            </div>
+
+            <div className="flex flex-row gap-2">
+              <button
+                onClick={filterByThisMonth}
+                className="bg-picosun text-black px-4 py-2 rounded"
+              >
+                This Month
+              </button>
+              <button
+                onClick={filterByThisWeek}
+                className="bg-midblue text-white px-4 py-2 rounded"
+              >
+                This Week
+              </button>
+              <button
+                onClick={filterByThisYear}
+                className="bg-radishred text-white px-4 py-2 rounded"
+              >
+                This Year
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 items-center">
-            <button
-              onClick={filterByThisMonth}
-              className="bg-picosun text-black px-4 py-2 rounded"
+          <div className="flex flex-col px-8 mb-4 w-fit">
+            <label htmlFor="classFilter" className="font-semibold mb-2">
+              Filter by Class Name:
+            </label>
+            <select
+              id="classFilter"
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="border p-2 rounded"
             >
-              This Month
-            </button>
-            <button
-              onClick={filterByThisWeek}
-              className="bg-midblue text-white px-4 py-2 rounded"
-            >
-              This Week
-            </button>
-            <button
-              onClick={filterByThisYear}
-              className="bg-radishred text-white px-4 py-2 rounded"
-            >
-              This Year
-            </button>
+              {classOptions.map((className, index) => (
+                <option key={index} value={className}>
+                  {className}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-
-        {/* Class Dropdown */}
-        <div className="flex flex-col px-8 mb-4 w-fit">
-          <label htmlFor="classFilter" className="font-semibold mb-2">
-            Filter by Class Name:
-          </label>
-          <select
-            id="classFilter"
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-            className="border p-2 rounded"
-          >
-            {classOptions.map((className, idx) => (
-              <option key={idx} value={className}>
-                {className}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Class Cards */}

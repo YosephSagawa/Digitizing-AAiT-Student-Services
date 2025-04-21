@@ -86,18 +86,21 @@ const AttendanceDetails = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <button
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-          onClick={handleDownloadCSV}
-        >
-          Download CSV
-        </button>
-        <button
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-          onClick={handleSendReport}
-        >
-          Send Report to Coordinator
-        </button>
+        <div className="mb-2">
+          <button
+            className="bg-midblue text-white hover:bg-blue-950 px-4 py-2 rounded-xl mr-4"
+            onClick={handleDownloadCSV}
+          >
+            Download CSV
+          </button>
+          <button
+            className="bg-radishred text-white hover:bg-red-900 px-4 py-2 rounded-xl"
+            onClick={handleSendReport}
+          >
+            Send Report to Coordinator
+          </button>
+        </div>
+
         <table className="w-full border-collapse bg-white">
           <thead>
             <tr className="bg-white text-left border-t">
