@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.decorators import api_view, permission_classes
+from django.core.mail import send_mail
 from .models import User, RFIDTag, Student, Instructor, Classes, ClassEnrollment, Attendance, AccessControl, Dormitory, DormitoryAssignment, CafeteriaTransaction, StudentProfile, InstructorProfile
 from .serializers import UserSerializer, RFIDTagSerializer, StudentSerializer, InstructorSerializer, ClassesSerializer, ClassEnrollmentSerializer, AttendanceSerializer, AccessControlSerializer, DormitorySerializer, DormitoryAssignmentSerializer, CafeteriaTransactionSerializer, CustomTokenObtainPairSerializer, StudentProfileSerializer,InstructorProfileSerializer
 
@@ -108,3 +110,27 @@ class CafeteriaTransactionViewSet(viewsets.ModelViewSet):
     serializer_class = CafeteriaTransactionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['rfid_tag__rfid_tag_id']
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def send_attendance_report(request):
+    class_name = request.data.get("class_name")
+    date = request.data.get("date")
+    attendance = request.data.get("attendance", [])
+
+    lines = [f"Attendance for {class_name} on {date}:\n"]
+    for rec in attendance:
+        lines.append(
+            f"{rec['student_name']} ({rec['student_id']}): {rec['status']} at {rec['time_in']}"
+        )
+
+    message = "\n".join(lines)
+
+    send_mail(
+        subject=f"Attendance Report for {class_name} - {date}",
+        message=message,
+        from_email="yosephsagawa0@gmail.com",
+        recipient_list=["yosephsagawa123@gmail.com"],  # or dynamically fetched
+    )
+
+    return Response({"message": "Report sent"})

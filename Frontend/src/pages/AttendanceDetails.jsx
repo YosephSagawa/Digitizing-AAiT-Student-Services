@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { exportAttendanceToCSV } from "../utils/exportToCSV";
 import { useParams, useLocation } from "react-router-dom";
 import Checkbox from "../components/Checkbox";
+import axios from "axios";
 
 const AttendanceDetails = () => {
   const { className, date } = useParams();
@@ -30,6 +32,40 @@ const AttendanceDetails = () => {
     );
   });
 
+  const handleDownloadCSV = () => {
+    exportAttendanceToCSV(className, date, filteredData);
+  };
+
+  const handleSendReport = async () => {
+    const token = localStorage.getItem("access_token");
+
+    try {
+      await axios.post(
+        "http://localhost:8000/api/send-report/",
+        {
+          class_name: className,
+          date: date,
+          attendance: filteredData.map((record) => ({
+            student_name: `${record.student.first_name} ${record.student.last_name}`,
+            student_id: record.student.student_id,
+            date: record.date,
+            status: record.status,
+            time_in: record.time_in,
+          })),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert("Report sent to course coordinator!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send report.");
+    }
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-4xl font-bold text-[#252C58] my-4">
@@ -50,6 +86,18 @@ const AttendanceDetails = () => {
       </div>
 
       <div className="overflow-x-auto">
+        <button
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          onClick={handleDownloadCSV}
+        >
+          Download CSV
+        </button>
+        <button
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          onClick={handleSendReport}
+        >
+          Send Report to Coordinator
+        </button>
         <table className="w-full border-collapse bg-white">
           <thead>
             <tr className="bg-white text-left border-t">
