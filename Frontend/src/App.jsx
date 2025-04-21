@@ -36,7 +36,7 @@ function App() {
         <Route element={<PrivateRoute allowedRoles={["instructor"]} />}>
           <Route path="/dashboard/lecturer" element={<LecturerDashboard />} />
           <Route
-            path="/attendance/:className/:date"
+            path="/attendance-details/:className/:date"
             element={<AttendanceDetails />}
           />
         </Route>

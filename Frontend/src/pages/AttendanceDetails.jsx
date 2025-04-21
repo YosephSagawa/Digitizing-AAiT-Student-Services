@@ -1,47 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import ClassAttendanceData from "../stores/ClassAttendanceData";
+import { useParams, useLocation } from "react-router-dom";
 import Checkbox from "../components/Checkbox";
 
 const AttendanceDetails = () => {
   const { className, date } = useParams();
+  const location = useLocation();
+  const attendanceFromRoute = location.state?.attendance || [];
+
   const [attendanceData, setAttendanceData] = useState([]);
   const [present, setPresent] = useState(false);
   const [absent, setAbsent] = useState(false);
   const [late, setLate] = useState(false);
 
-  const [checkboxStatus, setCheckboxStatus] = useState([]);
-
   useEffect(() => {
-    const filtered = ClassAttendanceData.studentData.filter(
-      (item) => item.className === className && item.date === date
-    );
+    const filtered = attendanceFromRoute.filter((item) => item.date === date);
     setAttendanceData(filtered);
-    setCheckboxStatus(
-      filtered.map((item) => ({
-        id: item.id,
-        isChecked: item.status === "Present" || item.status === "Late",
-      }))
-    );
-  }, [className, date]);
+  }, [attendanceFromRoute, date]);
 
   const togglePresent = () => setPresent(!present);
   const toggleAbsent = () => setAbsent(!absent);
   const toggleLate = () => setLate(!late);
 
-  const handleCheckboxChange = (id) => {
-    setCheckboxStatus((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isChecked: !item.isChecked } : item
-      )
-    );
-  };
-
   const filteredData = attendanceData.filter((item) => {
     return (
-      (present && item.status === "Present") ||
-      (absent && item.status === "Absent") ||
-      (late && item.status === "Late") ||
+      (present && item.status === "present") ||
+      (absent && item.status === "absent") ||
+      (late && item.status === "late") ||
       (!present && !absent && !late)
     );
   });
@@ -55,16 +39,13 @@ const AttendanceDetails = () => {
       <div className="flex gap-4 mt-10 mb-6 text-[#20285A]">
         <p>Filter by attendance status:</p>
         <p>
-          <Checkbox value={present} setValue={togglePresent} />
-          Present
+          <Checkbox value={present} setValue={togglePresent} /> Present
         </p>
         <p>
-          <Checkbox value={absent} setValue={toggleAbsent} />
-          Absent
+          <Checkbox value={absent} setValue={toggleAbsent} /> Absent
         </p>
         <p>
-          <Checkbox value={late} setValue={toggleLate} />
-          Late
+          <Checkbox value={late} setValue={toggleLate} /> Late
         </p>
       </div>
 
@@ -72,28 +53,23 @@ const AttendanceDetails = () => {
         <table className="w-full border-collapse bg-white">
           <thead>
             <tr className="bg-white text-left border-t">
-              <th className="py-3 px-4 border-b-2 font-bold text-md">Mark</th>
-              <th className="py-3 px-4 border-b-2 font-bold text-md">
-                Student Name
-              </th>
-              <th className="py-3 px-4 border-b-2 font-bold text-md">Status</th>
+              <th className="px-4 py-2">Student Name</th>
+              <th className="px-4 py-2">Date</th>
+              <th className="px-4 py-2">Time In</th>
+              <th className="px-4 py-2">Status</th>
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                <td className="py-3 px-4 border-b text-center">
-                  <input
-                    type="checkbox"
-                    checked={
-                      checkboxStatus.find((row) => row.id === item.id)
-                        ?.isChecked || false
-                    }
-                    onChange={() => handleCheckboxChange(item.id)}
-                  />
+            {filteredData.map((att) => (
+              <tr key={att.attendance_id} className="border-t">
+                <td className="px-4 py-2">
+                  {att.student.first_name} {att.student.last_name}
                 </td>
-                <td className="py-3 px-4 border-b">{item.studentName}</td>
-                <td className="py-3 px-4 border-b">{item.status}</td>
+                <td className="px-4 py-2">{att.date}</td>
+                <td className="px-4 py-2">
+                  {new Date(att.time_in).toLocaleTimeString()}
+                </td>
+                <td className="px-4 py-2 capitalize">{att.status}</td>
               </tr>
             ))}
           </tbody>

@@ -12,6 +12,7 @@ const LecturerDashboard = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [selectedClass, setSelectedClass] = useState("All");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,7 +20,7 @@ const LecturerDashboard = () => {
       try {
         const data = await getInstructorProfile();
         setInstructor(data.profile.instructor);
-        setClassData(data.profile.classes); // Fetch classes and attendance data
+        setClassData(data.profile.classes);
       } catch (error) {
         console.error("Error fetching instructor data:", error);
       }
@@ -27,10 +28,6 @@ const LecturerDashboard = () => {
 
     fetchInstructorData();
   }, []);
-
-  const handleCardClick = (className, date) => {
-    navigate(`/attendance/${className}/${date}`);
-  };
 
   const filterByThisMonth = () => {
     const now = new Date();
@@ -52,46 +49,61 @@ const LecturerDashboard = () => {
     setEndDate(new Date(now.getFullYear(), 11, 31));
   };
 
-  const filteredData = classData.filter((item) => {
-    return item.attendance.some((attendanceItem) => {
-      const classAttendanceDate = new Date(attendanceItem.date);
-      const matchesDateRange =
-        (!startDate || classAttendanceDate >= startDate) &&
-        (!endDate || classAttendanceDate <= endDate);
+  const filteredData = classData.filter((item) =>
+    item.attendance.some((att) => {
+      const date = new Date(att.date);
+      const matchesDate =
+        (!startDate || date >= startDate) && (!endDate || date <= endDate);
       const matchesClass =
         selectedClass === "All" || item.class_name === selectedClass;
-
-      return matchesDateRange && matchesClass;
-    });
-  });
+      return matchesDate && matchesClass;
+    })
+  );
 
   const attendanceCards = [];
 
   filteredData.forEach((classItem) => {
-    classItem.attendance.forEach((attendanceItem) => {
-      const attendanceDate = attendanceItem.date;
+    classItem.attendance.forEach((att) => {
+      const date = new Date(att.date);
+      const matchesDate =
+        (!startDate || date >= startDate) && (!endDate || date <= endDate);
 
-      const matchesDateRange =
-        (!startDate || new Date(attendanceDate) >= startDate) &&
-        (!endDate || new Date(attendanceDate) <= endDate);
-
-      if (matchesDateRange) {
+      if (matchesDate) {
         attendanceCards.push({
           className: classItem.class_name,
-          date: attendanceDate,
+          date: att.date,
+          attendance: classItem.attendance.filter((a) => a.date === att.date),
+          fullClassData: classItem,
         });
       }
     });
   });
 
   const uniqueCards = Array.from(
-    new Set(attendanceCards.map((item) => `${item.className}|${item.date}`))
+    new Set(attendanceCards.map((i) => `${i.className}|${i.date}`))
   )
     .map((key) => {
       const [className, date] = key.split("|");
-      return { className, date };
+      const original = attendanceCards.find(
+        (i) => i.className === className && i.date === date
+      );
+      return {
+        className,
+        date,
+        attendance: original.attendance,
+        fullClassData: original.fullClassData,
+      };
     })
-    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort recent first
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const handleCardClick = (classItem) => {
+    navigate(`/attendance-details/${classItem.className}/${classItem.date}`, {
+      state: {
+        attendance: classItem.attendance,
+        classInfo: classItem.fullClassData,
+      },
+    });
+  };
 
   const classOptions = [
     "All",
@@ -104,7 +116,7 @@ const LecturerDashboard = () => {
       <div className="px-6">
         <div className="flex flex-col w-fit justify-start sm:p-8 mt-2">
           <h1 className="text-2xl sm:text-4xl font-bold mt-8 sm:mt-0">
-            Welcome, {`${instructor?.first_name}`}
+            Welcome, {instructor?.first_name}
           </h1>
         </div>
 
@@ -117,7 +129,7 @@ const LecturerDashboard = () => {
               selectsStart
               startDate={startDate}
               endDate={endDate}
-              placeholderText="Start Date (MM/DD/YYYY)"
+              placeholderText="Start Date"
               className="border p-2 rounded"
             />
             <ReactDatePicker
@@ -126,7 +138,7 @@ const LecturerDashboard = () => {
               selectsEnd
               startDate={startDate}
               endDate={endDate}
-              placeholderText="End Date (optional)"
+              placeholderText="End Date"
               className="border p-2 rounded"
             />
           </div>
@@ -164,8 +176,8 @@ const LecturerDashboard = () => {
             onChange={(e) => setSelectedClass(e.target.value)}
             className="border p-2 rounded"
           >
-            {classOptions.map((className, index) => (
-              <option key={index} value={className}>
+            {classOptions.map((className, idx) => (
+              <option key={idx} value={className}>
                 {className}
               </option>
             ))}
@@ -174,12 +186,12 @@ const LecturerDashboard = () => {
 
         {/* Class Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-          {uniqueCards.map(({ className, date }) => (
+          {uniqueCards.map((item, idx) => (
             <ClassCard
-              key={`${className}-${date}`}
-              className={className}
-              date={date}
-              onClick={() => handleCardClick(className, date)}
+              key={`${item.className}-${item.date}-${idx}`}
+              className={item.className}
+              date={item.date}
+              onClick={() => handleCardClick(item)}
             />
           ))}
         </div>
