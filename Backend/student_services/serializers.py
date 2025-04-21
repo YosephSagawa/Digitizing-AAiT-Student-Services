@@ -101,8 +101,28 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         model = StudentProfile
         fields = ['student']
 
+
+
+
+class AttendanceForClassSerializer(serializers.ModelSerializer):
+    student = StudentSerializer()
+    status = serializers.CharField(source='get_status_display')  # Display status as a human-readable field
+
+    class Meta:
+        model = Attendance
+        fields = ['attendance_id', 'student', 'date', 'status']
+
+class ClassesWithAttendanceSerializer(serializers.ModelSerializer):
+    instructor = InstructorSerializer()
+    attendances = AttendanceForClassSerializer(source='attendance_set', many=True)
+
+    class Meta:
+        model = Classes
+        fields = ['class_id', 'class_name', 'schedule', 'attendances']
+
 class InstructorProfileSerializer(serializers.ModelSerializer):
     instructor = InstructorSerializer()
+    classes = ClassesWithAttendanceSerializer(many=True, read_only=True)
     class Meta:
         model = InstructorProfile
-        fields = ['instructor']
+        fields = ['instructor', 'classes']

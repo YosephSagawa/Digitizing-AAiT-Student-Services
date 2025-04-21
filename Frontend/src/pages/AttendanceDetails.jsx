@@ -48,7 +48,7 @@ const AttendanceDetails = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-[#252C58] my-4">
+      <h1 className="text-4xl font-bold text-[#252C58] my-4">
         Attendance for {className} on {new Date(date).toLocaleDateString()}
       </h1>
 

@@ -27,7 +27,25 @@ class UserProfileView(APIView):
         elif user.role == 'instructor':
             try:
                 profile = InstructorProfile.objects.get(user=user)
-                user_data['profile'] = InstructorProfileSerializer(profile).data
+                instructor_data = InstructorProfileSerializer(profile).data
+                # Get the classes the instructor teaches
+                instructor_classes = Classes.objects.filter(instructor=profile.instructor)
+                
+                # Serialize classes
+                classes_data = ClassesSerializer(instructor_classes, many=True).data
+
+                # Include the attendance for each class
+                for class_data in classes_data:
+                    # Filter attendance based on class and instructor's students
+                    class_instance = Classes.objects.get(class_id=class_data['class_id'])
+                    attendance_data = Attendance.objects.filter(class_instance=class_instance)
+                    attendance_serialized = AttendanceSerializer(attendance_data, many=True).data
+                    class_data['attendance'] = attendance_serialized
+
+                # Add the classes and attendances to the profile
+                instructor_data['classes'] = classes_data
+                user_data['profile'] = instructor_data
+
             except InstructorProfile.DoesNotExist:
                 return Response({"error": "Instructor profile not found"}, status=status.HTTP_404_NOT_FOUND)
 

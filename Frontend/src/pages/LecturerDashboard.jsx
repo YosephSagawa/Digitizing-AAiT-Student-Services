@@ -1,24 +1,37 @@
 import React, { useState, useEffect } from "react";
+import { getInstructorProfile } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ClassCard from "../components/ClassCard";
-import ClassAttendanceData from "../stores/ClassAttendanceData";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const LecturerDashboard = () => {
-  const data = ClassAttendanceData.studentData;
+  const [instructor, setInstructor] = useState(null);
+  const [classData, setClassData] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [selectedClass, setSelectedClass] = useState("All");
   const navigate = useNavigate();
 
-  // Handle redirect to class attendance detail page
+  useEffect(() => {
+    const fetchInstructorData = async () => {
+      try {
+        const data = await getInstructorProfile();
+        setInstructor(data.profile.instructor);
+        setClassData(data.profile.classes); // Fetch classes and attendance data
+      } catch (error) {
+        console.error("Error fetching instructor data:", error);
+      }
+    };
+
+    fetchInstructorData();
+  }, []);
+
   const handleCardClick = (className, date) => {
     navigate(`/attendance/${className}/${date}`);
   };
 
-  // Date filtering functions for quick buttons
   const filterByThisMonth = () => {
     const now = new Date();
     setStartDate(new Date(now.getFullYear(), now.getMonth(), 1));
@@ -39,32 +52,59 @@ const LecturerDashboard = () => {
     setEndDate(new Date(now.getFullYear(), 11, 31));
   };
 
-  const filteredData = data.filter((row) => {
-    const rowDate = new Date(row.date);
+  const filteredData = classData.filter((item) => {
+    return item.attendance.some((attendanceItem) => {
+      const classAttendanceDate = new Date(attendanceItem.date);
+      const matchesDateRange =
+        (!startDate || classAttendanceDate >= startDate) &&
+        (!endDate || classAttendanceDate <= endDate);
+      const matchesClass =
+        selectedClass === "All" || item.class_name === selectedClass;
 
-    const matchesDateRange =
-      (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate);
-
-    const matchesClass =
-      selectedClass === "All" || row.className === selectedClass;
-
-    return matchesDateRange && matchesClass;
+      return matchesDateRange && matchesClass;
+    });
   });
 
-  // Extract unique class names for the dropdown
+  const attendanceCards = [];
+
+  filteredData.forEach((classItem) => {
+    classItem.attendance.forEach((attendanceItem) => {
+      const attendanceDate = attendanceItem.date;
+
+      const matchesDateRange =
+        (!startDate || new Date(attendanceDate) >= startDate) &&
+        (!endDate || new Date(attendanceDate) <= endDate);
+
+      if (matchesDateRange) {
+        attendanceCards.push({
+          className: classItem.class_name,
+          date: attendanceDate,
+        });
+      }
+    });
+  });
+
+  const uniqueCards = Array.from(
+    new Set(attendanceCards.map((item) => `${item.className}|${item.date}`))
+  )
+    .map((key) => {
+      const [className, date] = key.split("|");
+      return { className, date };
+    })
+    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort recent first
+
   const classOptions = [
     "All",
-    ...new Set(ClassAttendanceData.studentData.map((row) => row.className)),
+    ...new Set(classData.map((item) => item.class_name)),
   ];
-  console.log(filteredData);
 
   return (
     <div>
-      <Navbar />
+      <Navbar name={instructor?.first_name} photo={instructor?.image} />
       <div className="px-6">
         <div className="flex flex-col w-fit justify-start sm:p-8 mt-2">
           <h1 className="text-2xl sm:text-4xl font-bold mt-8 sm:mt-0">
-            Lecturer Dashboard
+            Welcome, {`${instructor?.first_name}`}
           </h1>
         </div>
 
@@ -134,15 +174,14 @@ const LecturerDashboard = () => {
 
         {/* Class Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {filteredData.map((item) => (
-              <ClassCard
-                key={item.id}
-                className={item.className}
-                date={item.date}
-                onClick={() => handleCardClick(item.className, item.date)}
-              />
-            ))
-          }
+          {uniqueCards.map(({ className, date }) => (
+            <ClassCard
+              key={`${className}-${date}`}
+              className={className}
+              date={date}
+              onClick={() => handleCardClick(className, date)}
+            />
+          ))}
         </div>
       </div>
     </div>

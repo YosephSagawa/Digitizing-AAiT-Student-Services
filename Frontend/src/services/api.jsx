@@ -21,3 +21,9 @@ export const getStudentProfile = async () => {
   console.log(response);
   return response.data;
 };
+
+export const getInstructorProfile = async () => {
+  const response = await api.get("/api/auth/profile/");
+  console.log(response);
+  return response.data;
+};
