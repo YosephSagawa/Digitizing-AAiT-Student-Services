@@ -12,6 +12,7 @@ import RFIDIssuancePage from "./pages/RFIDIssuance";
 import StudentAllocation from "./pages/StudentAllocation";
 import ManageDorms from "./pages/ManageDorms";
 import StudentAttendance from "./pages/StudentAttendance";
+import AttendanceDetails from "./pages/AttendanceDetails";
 
 import PrivateRoute from "./components/PrivateRoute";
 
@@ -34,6 +35,10 @@ function App() {
         {/* Lecturer Routes */}
         <Route element={<PrivateRoute allowedRoles={["instructor"]} />}>
           <Route path="/dashboard/lecturer" element={<LecturerDashboard />} />
+          <Route
+            path="/attendance/:className/:date"
+            element={<AttendanceDetails />}
+          />
         </Route>
 
         {/* Student Attendance (can also restrict if needed) */}
