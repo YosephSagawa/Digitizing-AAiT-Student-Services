@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import api_view, permission_classes
@@ -90,6 +91,49 @@ class AttendanceViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['student__student_id']
+
+    def create(self, request, *args, **kwargs):
+        rfid_tag_id = request.data.get('rfid_tag_id')
+        class_id = request.data.get('class_id')
+
+        if not rfid_tag_id or not class_id:
+            return Response({"error": "rfid_tag_id and class_id are required"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Find the student based on the RFID tag
+            student = Student.objects.get(rfid_tag__rfid_tag_id=rfid_tag_id)
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            # Find the class instance
+            class_instance = Classes.objects.get(class_id=class_id)
+        except Classes.DoesNotExist:
+            return Response({"error": "Class not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        # Check if student is enrolled in the class
+        enrolled = ClassEnrollment.objects.filter(
+            student=student, class_instance=class_instance).exists()
+        if not enrolled:
+            return Response({"error": "Student not enrolled in this class"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # (Optional) You can check class schedule validity here if needed
+
+        # Create the attendance entry
+        attendance = Attendance.objects.create(
+            student=student,
+            class_instance=class_instance,
+            time_in=timezone.now(),
+            status="present"
+        )
+
+        serializer = AttendanceSerializer(attendance)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class AccessControlViewSet(viewsets.ModelViewSet):
     queryset = AccessControl.objects.all()
