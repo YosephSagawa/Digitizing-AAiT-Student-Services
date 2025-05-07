@@ -128,6 +128,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
             student=student,
             class_instance=class_instance,
             time_in=timezone.now(),
+            date=timezone.now().date(),
             status="present"
         )
 
