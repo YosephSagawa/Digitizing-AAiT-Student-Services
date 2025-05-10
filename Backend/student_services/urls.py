@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # Create a router and register the viewsets with it
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'rfid-tags', RFIDTagViewSet)
+router.register(r'rfid-tags', RFIDTagViewSet, basename='rfidtag')
 router.register(r'students', StudentViewSet)
 router.register(r'instructors', InstructorViewSet)
 router.register(r'classes', ClassesViewSet)

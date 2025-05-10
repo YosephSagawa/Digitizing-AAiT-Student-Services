@@ -19,7 +19,7 @@ const DormitoryLogs = () => {
           profileRes.data.profile.student.rfid_tag.rfid_tag_id;
 
         const logsRes = await axios.get(
-          `http://localhost:8000/api/access-control/?rfid_tag__rfid_tag_id=${studentRFID}&location=dormitory`,
+          `http://localhost:8000/api/access-control/?rfid_tag__rfid_tag_id=${studentRFID}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

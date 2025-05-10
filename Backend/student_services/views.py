@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from django.utils import timezone
 from datetime import time
 from django_filters.rest_framework import DjangoFilterBackend
@@ -67,6 +68,9 @@ class UserViewSet(viewsets.ModelViewSet):
 class RFIDTagViewSet(viewsets.ModelViewSet):
     queryset = RFIDTag.objects.all()
     serializer_class = RFIDTagSerializer
+    lookup_field = 'rfid_tag_id'
+
+    
 
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
@@ -77,6 +81,8 @@ class StudentViewSet(viewsets.ModelViewSet):
 class InstructorViewSet(viewsets.ModelViewSet):
     queryset = Instructor.objects.all()
     serializer_class = InstructorSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['rfid_tag__rfid_tag_id']
 
 class ClassesViewSet(viewsets.ModelViewSet):
     queryset = Classes.objects.all()
@@ -140,6 +146,29 @@ class AccessControlViewSet(viewsets.ModelViewSet):
     serializer_class = AccessControlSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['rfid_tag__rfid_tag_id', 'location']
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        rfid_tag_id = request.data.get('rfid_tag_id')
+        location = request.data.get('location')
+
+        now = timezone.now()
+        # Find the student by RFID
+        try:
+            student = Student.objects.get(rfid_tag__rfid_tag_id=rfid_tag_id)
+        except Student.DoesNotExist:
+            return Response({'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Create access log
+        log = AccessControl.objects.create(
+            rfid_tag_id=rfid_tag_id,
+            location=location,
+            access_time=now,
+            status='granted'
+        )
+
+        serializer = AccessControlSerializer(log)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class DormitoryViewSet(viewsets.ModelViewSet):
     queryset = Dormitory.objects.all()
@@ -167,7 +196,7 @@ class CafeteriaTransactionViewSet(viewsets.ModelViewSet):
             return Response({"error": "Invalid or inactive RFID tag."}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            student = Student.objects.get(rfid_tag=rfid_tag)
+            student = Student.objects.get(rfid_tag__rfid_tag_id=rfid_tag_id)
         except Student.DoesNotExist:
             return Response({"error": "No student associated with this RFID tag."}, status=status.HTTP_403_FORBIDDEN)
 
