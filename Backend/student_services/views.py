@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
+from datetime import time
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import api_view, permission_classes
@@ -121,8 +122,6 @@ class AttendanceViewSet(viewsets.ModelViewSet):
             return Response({"error": "Student not enrolled in this class"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        # (Optional) You can check class schedule validity here if needed
-
         # Create the attendance entry
         attendance = Attendance.objects.create(
             student=student,
@@ -155,6 +154,50 @@ class CafeteriaTransactionViewSet(viewsets.ModelViewSet):
     serializer_class = CafeteriaTransactionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['rfid_tag__rfid_tag_id']
+
+    def create(self, request, *args, **kwargs):
+        rfid_tag_id = request.data.get('rfid_tag_id')
+
+        if not rfid_tag_id:
+            return Response({"error": "RFID tag ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            rfid_tag = RFIDTag.objects.get(rfid_tag_id=rfid_tag_id, status='active')
+        except RFIDTag.DoesNotExist:
+            return Response({"error": "Invalid or inactive RFID tag."}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            student = Student.objects.get(rfid_tag=rfid_tag)
+        except Student.DoesNotExist:
+            return Response({"error": "No student associated with this RFID tag."}, status=status.HTTP_403_FORBIDDEN)
+
+        now = timezone.now()
+        current_time = now.time()
+
+        def get_service_type(t):
+            if time(6, 0) <= t <= time(9, 30):
+                return 'breakfast'
+            elif time(11, 0) <= t <= time(14, 0):
+                return 'lunch'
+            elif time(15, 0) <= t <= time(21, 0):
+                return 'dinner'
+            return None
+
+        service_type = get_service_type(current_time)
+        if not service_type:
+            return Response({"error": "Not a valid time for cafeteria service."}, status=status.HTTP_403_FORBIDDEN)
+
+        # Create the transaction
+        transaction = CafeteriaTransaction.objects.create(
+            rfid_tag=rfid_tag,
+            service_type=service_type,
+            transaction_time=now,
+            date=now.date()
+        )
+
+        return Response({
+            "message": f"{service_type.title()} access granted to {student.first_name} {student.last_name}."
+        }, status=status.HTTP_201_CREATED)
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
