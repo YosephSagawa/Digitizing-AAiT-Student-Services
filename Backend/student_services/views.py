@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from django.utils import timezone
-from datetime import time
+from datetime import time, timedelta,datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import api_view, permission_classes, action
@@ -127,14 +127,31 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         if not enrolled:
             return Response({"error": "Student not enrolled in this class"},
                             status=status.HTTP_400_BAD_REQUEST)
+        
+         # Check if already marked for today
+        today = timezone.now().date()
+        already_marked = Attendance.objects.filter(
+            student=student,
+            class_instance=class_instance,
+            date=today
+        ).exists()
+        if already_marked:
+            return Response({"message": "Attendance already recorded."}, status=status.HTTP_200_OK)
+        
+         # Check if student is late
+        now = timezone.now()
+        class_start_time = timezone.make_aware(datetime.datetime.combine(now.date(), class_instance.start_time))
+        lateness_threshold = class_start_time + timedelta(minutes=5)
+
+        status_value = "late" if now > lateness_threshold else "present"
 
         # Create the attendance entry
         attendance = Attendance.objects.create(
             student=student,
             class_instance=class_instance,
-            time_in=timezone.now(),
-            date=timezone.now().date(),
-            status="present"
+            time_in=now,
+            date=today,
+            status=status_value
         )
 
         serializer = AttendanceSerializer(attendance)
