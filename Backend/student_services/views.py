@@ -7,7 +7,7 @@ from django.utils import timezone
 from datetime import time
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from django.core.mail import send_mail
 from .models import User, RFIDTag, Student, Instructor, Classes, ClassEnrollment, Attendance, AccessControl, Dormitory, DormitoryAssignment, CafeteriaTransaction, StudentProfile, InstructorProfile
 from .serializers import UserSerializer, RFIDTagSerializer, StudentSerializer, InstructorSerializer, ClassesSerializer, ClassEnrollmentSerializer, AttendanceSerializer, AccessControlSerializer, DormitorySerializer, DormitoryAssignmentSerializer, CafeteriaTransactionSerializer, CustomTokenObtainPairSerializer, StudentProfileSerializer,InstructorProfileSerializer
@@ -95,7 +95,7 @@ class ClassEnrollmentViewSet(viewsets.ModelViewSet):
 class AttendanceViewSet(viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['student__student_id']
 
@@ -177,6 +177,40 @@ class DormitoryViewSet(viewsets.ModelViewSet):
 class DormitoryAssignmentViewSet(viewsets.ModelViewSet):
     queryset = DormitoryAssignment.objects.all()
     serializer_class = DormitoryAssignmentSerializer
+
+    @action(detail=False, methods=['post'], url_path='check-access')
+    def check_access(self, request):
+        rfid_tag_id = request.data.get('rfid_tag_id')
+        dormitory_id = request.data.get('dormitory_id')
+
+        if not rfid_tag_id or not dormitory_id:
+            return Response({'error': 'Missing RFID tag or dormitory ID'}, status=400)
+
+        try:
+            rfid_tag = RFIDTag.objects.get(rfid_tag_id=rfid_tag_id, status='active')
+            student = Student.objects.get(rfid_tag=rfid_tag)
+        except (RFIDTag.DoesNotExist, Student.DoesNotExist):
+            AccessControl.objects.create(
+                rfid_tag_id=rfid_tag_id,
+                location='dormitory',
+                status='denied',
+                access_time=timezone.now()
+            )
+            return Response({'access': 'denied', 'reason': 'Invalid or inactive RFID or student not found'}, status=403)
+
+        # Check dormitory assignment
+        assigned = DormitoryAssignment.objects.filter(student=student, dormitory_id=dormitory_id).exists()
+        access_status = 'granted' if assigned else 'denied'
+
+        # Log the access attempt
+        AccessControl.objects.create(
+            rfid_tag=rfid_tag,
+            location='dormitory',
+            status=access_status,
+            access_time=timezone.now()
+        )
+
+        return Response({'access': access_status}, status=200 if access_status == 'granted' else 403)
 
 class CafeteriaTransactionViewSet(viewsets.ModelViewSet):
     queryset = CafeteriaTransaction.objects.all()
