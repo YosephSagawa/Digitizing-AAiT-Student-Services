@@ -1,17 +1,16 @@
 import Navbar from "../components/Navbar";
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { getStudentProfile } from "../services/api";
+import { getStudentProfile, generateOTP } from "../services/api";
 
 //Components
 import DashboardCard from "../components/DashboardCard";
 
 const StudentDashboard = () => {
-  const [studentId, setStudentId] = useState("");
-  const [reason, setReason] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const [student, setStudent] = useState(null);
-
+  const [otpRequested, setOtpRequested] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -25,13 +24,20 @@ const StudentDashboard = () => {
     fetchProfile();
   }, []);
 
-  if (!student) return <p>Loading...</p>;
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Request submitted:", { studentId, reason });
-    setSubmitted(true);
+  const handleRequestOTP = async () => {
+    try {
+      const response = await generateOTP();
+      setMessage("OTP sent to your email!");
+      setOtpRequested(true);
+      setError("");
+    } catch (error) {
+      setError("Failed to request OTP. Please try again.");
+      setMessage("");
+      console.error("OTP request error:", error);
+    }
   };
+
+  if (!student) return <p>Loading...</p>;
 
   return (
     <div>
@@ -68,45 +74,22 @@ const StudentDashboard = () => {
           <div>
             <div className="flex flex-col w-fit justify-start sm:p-8 mt-2 mx-auto">
               <h1 className="text-gray-600 text-2xl sm:text-2xl font-semibold mt-8 sm:mt-0">
-                Request Lost Card Replacement
+                Request OTP for Access
               </h1>
             </div>
             <div className="flex flex-col w-full sm:w-2/3 p-8 mt-4 border rounded-md mx-auto">
-              {submitted ? (
-                <p className="text-green-600 font-bold">
-                  Your request has been submitted successfully!
-                </p>
+              {otpRequested ? (
+                <p className="text-green-600 font-bold">{message}</p>
               ) : (
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                  <label className="font-bold text-lg">Student ID:</label>
-                  <input
-                    type="text"
-                    value={studentId}
-                    onChange={(e) => setStudentId(e.target.value)}
-                    placeholder="Enter your student ID"
-                    className="border p-2 rounded-md"
-                    required
-                  />
-
-                  <label className="font-bold text-lg">
-                    Reason for Replacement:
-                  </label>
-                  <textarea
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    placeholder="Describe the reason for the card replacement"
-                    className="border p-2 rounded-md"
-                    rows="4"
-                    required
-                  ></textarea>
-
+                <>
+                  {error && <p className="text-red-600 font-bold">{error}</p>}
                   <button
-                    type="submit"
+                    onClick={handleRequestOTP}
                     className="bg-midblue hover:bg-black text-white font-bold py-2 px-4 rounded"
                   >
-                    Submit Request
+                    Request OTP
                   </button>
-                </form>
+                </>
               )}
             </div>
           </div>

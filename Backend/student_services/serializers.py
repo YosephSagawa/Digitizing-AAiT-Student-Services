@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import User, RFIDTag, Student, Instructor, Classes, ClassEnrollment, Attendance, AccessControl, Dormitory, DormitoryAssignment, CafeteriaTransaction, StudentProfile, InstructorProfile
+from .models import User, RFIDTag, Student, Instructor, Classes, ClassEnrollment, Attendance, AccessControl, Dormitory, DormitoryAssignment, CafeteriaTransaction, StudentProfile, InstructorProfile, OTP
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -63,11 +63,12 @@ class AttendanceSerializer(serializers.ModelSerializer):
         fields = ['attendance_id', 'student', 'class_instance', 'date', 'time_in', 'status']
 
 class AccessControlSerializer(serializers.ModelSerializer):
-    rfid_tag = RFIDTagSerializer()  # Nested RFIDTagSerializer
+    rfid_tag = RFIDTagSerializer(allow_null=True)  # Nested RFIDTagSerializer
+    otp = serializers.CharField(max_length=6, allow_null=True)
 
     class Meta:
         model = AccessControl
-        fields = ['access_id', 'rfid_tag', 'location', 'access_time', 'status']
+        fields = ['access_id', 'rfid_tag', 'otp', 'location', 'access_time', 'status']
 
 class DormitorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -89,20 +90,22 @@ class DormitoryAssignmentSerializer(serializers.ModelSerializer):
         return dormitory_assignment
 
 class CafeteriaTransactionSerializer(serializers.ModelSerializer):
-    rfid_tag = RFIDTagSerializer()  # Nested RFIDTagSerializer
-
+    rfid_tag = RFIDTagSerializer(allow_null=True)  # Nested RFIDTagSerializer
+    otp = serializers.CharField(max_length=6, allow_null=True)
     class Meta:
         model = CafeteriaTransaction
-        fields = ['transaction_id', 'rfid_tag', 'service_type', 'transaction_time', 'date']
+        fields = ['transaction_id', 'rfid_tag', 'otp', 'service_type', 'transaction_time', 'date']
+
+class OTPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OTP
+        fields = ['otp_id', 'code', 'student', 'created_at', 'expires_at', 'status']
 
 class StudentProfileSerializer(serializers.ModelSerializer):
     student = StudentSerializer()
     class Meta:
         model = StudentProfile
         fields = ['student']
-
-
-
 
 class AttendanceForClassSerializer(serializers.ModelSerializer):
     student = StudentSerializer()

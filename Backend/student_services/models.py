@@ -30,6 +30,11 @@ CAFETERIA_SERVICE_CHOICES = [
     ('dinner', 'Dinner'),
 ]
 
+OTP_STATUS_CHOICES = [
+    ('valid', 'Valid'),
+    ('used', 'Used'),
+    ('expired', 'Expired'),
+]
 
 
 class User(AbstractUser):
@@ -105,13 +110,14 @@ class Attendance(models.Model):
 
 class AccessControl(models.Model):
     access_id = models.AutoField(primary_key=True)
-    rfid_tag = models.ForeignKey(RFIDTag, on_delete=models.CASCADE)
+    rfid_tag = models.ForeignKey(RFIDTag, on_delete=models.CASCADE,null=True,blank=True)
+    otp = models.CharField(max_length=6, null=True, blank=True)
     location = models.CharField(max_length=50, choices=ACCESS_LOCATION_CHOICES)
     access_time = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=10, choices=ACCESS_STATUS_CHOICES, default='granted')
 
     def __str__(self):
-        return f"{self.rfid_tag} at {self.location} - {self.access_time}"
+        return f"{self.rfid_tag or self.otp} at {self.location} - {self.access_time}"
 
 class Dormitory(models.Model):
     dormitory_id = models.AutoField(primary_key=True)
@@ -136,13 +142,25 @@ class DormitoryAssignment(models.Model):
 
 class CafeteriaTransaction(models.Model):
     transaction_id = models.AutoField(primary_key=True)
-    rfid_tag = models.ForeignKey(RFIDTag, on_delete=models.CASCADE)
+    rfid_tag = models.ForeignKey(RFIDTag, on_delete=models.CASCADE,null=True,blank=True)
+    otp = models.CharField(max_length=6, null=True, blank=True)
     service_type = models.CharField(max_length=50, choices=CAFETERIA_SERVICE_CHOICES)
     transaction_time = models.DateTimeField(default=timezone.now)
     date = models.DateField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.rfid_tag} - {self.service_type} at {self.transaction_time}"
+        return f"{self.rfid_tag or self.otp} - {self.service_type} at {self.transaction_time}"
+
+class OTP(models.Model):
+    otp_id = models.AutoField(primary_key=True)
+    code = models.CharField(max_length=6)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+    expires_at = models.DateTimeField()
+    status = models.CharField(max_length=10, choices=OTP_STATUS_CHOICES, default='valid')
+
+    def __str__(self):
+        return f"OTP {self.code} for {self.student} - {self.status}"
 
 
 class StudentProfile(models.Model):

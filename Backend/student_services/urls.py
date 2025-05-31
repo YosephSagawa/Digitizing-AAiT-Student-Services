@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet, RFIDTagViewSet, StudentViewSet, InstructorViewSet, ClassesViewSet, ClassEnrollmentViewSet, AttendanceViewSet, AccessControlViewSet, DormitoryViewSet, DormitoryAssignmentViewSet, CafeteriaTransactionViewSet, CustomTokenObtainPairView, UserProfileView,send_attendance_report
+from .views import UserViewSet, RFIDTagViewSet, StudentViewSet, InstructorViewSet, ClassesViewSet, ClassEnrollmentViewSet, AttendanceViewSet, AccessControlViewSet, DormitoryViewSet, DormitoryAssignmentViewSet, CafeteriaTransactionViewSet, CustomTokenObtainPairView, UserProfileView,send_attendance_report,GenerateOTPView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -23,5 +23,6 @@ urlpatterns = [
      path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/profile/', UserProfileView.as_view(), name='user_profile'),
+    path('auth/generate-otp/', GenerateOTPView.as_view(), name='generate_otp'),
     path("send-report/", send_attendance_report, name="send_attendance_report"),
 ]

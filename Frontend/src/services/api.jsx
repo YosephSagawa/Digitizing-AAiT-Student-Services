@@ -27,3 +27,8 @@ export const getInstructorProfile = async () => {
   console.log(response);
   return response.data;
 };
+
+export const generateOTP = async () => {
+  const response = await api.post("/api/auth/generate-otp/");
+  return response.data;
+};

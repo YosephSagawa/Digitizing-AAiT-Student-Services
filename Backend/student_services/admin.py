@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import RFIDTag,Student,Instructor,Classes,ClassEnrollment,Attendance,AccessControl,Dormitory,DormitoryAssignment,CafeteriaTransaction,User,StudentProfile,InstructorProfile
+from .models import RFIDTag,Student,Instructor,Classes,ClassEnrollment,Attendance,AccessControl,Dormitory,DormitoryAssignment,CafeteriaTransaction,User,StudentProfile,InstructorProfile,OTP
 
 class UserAdmin(BaseUserAdmin):
     fieldsets = BaseUserAdmin.fieldsets + (
@@ -22,3 +22,4 @@ admin.site.register(DormitoryAssignment)
 admin.site.register(CafeteriaTransaction)
 admin.site.register(StudentProfile)
 admin.site.register(InstructorProfile)
+admin.site.register(OTP)
