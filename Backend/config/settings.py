@@ -161,5 +161,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'yosephsagawa0@gmail.com'  # Your Gmail address
-EMAIL_HOST_PASSWORD = 'xvjs erja onpx ykkm'  # Use an app password, NOT your Gmail password
+EMAIL_HOST_PASSWORD = ''  # Use an app password, NOT your Gmail password
 DEFAULT_FROM_EMAIL = 'yosephsagawa0@gmail.com'
